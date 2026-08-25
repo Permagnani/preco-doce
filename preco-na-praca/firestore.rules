@@ -1,0 +1,36 @@
+// firestore.rules
+//
+// Cole este conteúdo em: Firebase Console > Firestore Database > Regras.
+//
+// Como o app não tem login, qualquer pessoa com o link pode ler e criar
+// itens/preços (é assim que o "todo mundo registra preço" funciona).
+// Ninguém pode editar ou apagar um registro já existente — só criar novos
+// (isso mantém o histórico confiável: se o preço mudou, registra de novo).
+//
+// Se no futuro você quiser controlar quem participa, dá pra trocar por
+// Firebase Authentication e usar request.auth.uid nestas regras.
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /items/{itemId} {
+      allow read: if true;
+      allow create: if request.resource.data.name is string
+                    && request.resource.data.name.size() > 0;
+      allow update, delete: if false;
+    }
+
+    match /price_records/{priceId} {
+      allow read: if true;
+      allow create: if request.resource.data.item_id is string
+                    && request.resource.data.price is number
+                    && request.resource.data.price > 0
+                    && request.resource.data.unit in ['kg', 'unidade']
+                    && request.resource.data.place is string
+                    && request.resource.data.person is string;
+      allow update, delete: if false;
+    }
+  }
+}
