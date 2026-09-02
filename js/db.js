@@ -43,12 +43,11 @@ const DB = {
     }
   },
 
-  /** Cria um novo item no catálogo */
-  async addItem(name, category) {
+    /** Cria um novo item no catálogo */
+  async addItem(name) {
     try {
       const ref = await firestore.collection("items").add({
         name,
-        category,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       });
       const doc = await ref.get();

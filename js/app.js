@@ -40,7 +40,7 @@ function lowestPrice(itemId, unit){
 function render(){
   const gridArea = document.getElementById('gridArea');
   const q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
-  const filtered = items.filter(it => it.name.toLowerCase().includes(q) || (it.category||'').toLowerCase().includes(q));
+  const filtered = items.filter(it => it.name.toLowerCase().includes(q));
 
   if(!items.length){
     gridArea.innerHTML = `<div class="empty-state">
@@ -63,7 +63,6 @@ function render(){
     const count = prices.filter(p=>p.item_id===it.id).length;
     return `
       <div class="tag" data-id="${it.id}">
-        <div class="tag-cat">${escapeHtml(it.category || 'geral')}</div>
         <div class="tag-name">${escapeHtml(it.name)}</div>
         <div class="tag-prices">
           <div class="price-box ${kg?'':'empty'}">
@@ -98,7 +97,6 @@ function openDetail(itemId){
   const item = items.find(i=>i.id===itemId);
   if(!item) return;
   document.getElementById('detailName').textContent = item.name;
-  document.getElementById('detailCat').textContent = item.category || 'geral';
   const list = prices.filter(p=>p.item_id===itemId).sort((a,b)=> b.date.localeCompare(a.date));
   const histEl = document.getElementById('detailHistory');
   if(!list.length){
@@ -146,16 +144,14 @@ function setupEvents(){
 
   document.getElementById('openAddItem').addEventListener('click', ()=>{
     document.getElementById('itemName').value='';
-    document.getElementById('itemCategory').value='';
     document.getElementById('errItem').classList.remove('show');
     openModal('overlayItem');
   });
 
   document.getElementById('saveItem').addEventListener('click', async ()=>{
     const name = document.getElementById('itemName').value.trim();
-    const category = document.getElementById('itemCategory').value.trim();
     if(!name){ document.getElementById('errItem').classList.add('show'); return; }
-    const created = await DB.addItem(name, category);
+    const created = await DB.addItem(name);
     if(created){ items.push(created); }
     populateItemSelect();
     render();
