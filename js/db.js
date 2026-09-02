@@ -70,7 +70,7 @@ const DB = {
   },
 
   /** Registra um novo preço visto por alguém */
-  async addPrice({ itemId, price, unit, place, person, date }) {
+  async addPrice({ itemId, price, unit, place, person, date, uid }) {
     try {
       const ref = await firestore.collection("price_records").add({
         item_id: itemId,
@@ -79,6 +79,7 @@ const DB = {
         place,
         person,
         date,
+        uid,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       });
       const doc = await ref.get();
