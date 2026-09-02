@@ -10,6 +10,7 @@ let items = [];
 let prices = [];
 let currentUnit = 'kg';
 let detailItemId = null;
+let currentUser = null;
 
 function todayStr(){ return new Date().toISOString().slice(0,10); }
 function fmtDate(d){
@@ -120,8 +121,10 @@ function openAddPriceModal(preselectId){
   document.getElementById('errPrice').classList.remove('show');
   document.getElementById('priceValue').value='';
   document.getElementById('priceLocal').value='';
-  document.getElementById('priceNome').value='';
   document.getElementById('priceData').value = todayStr();
+  document.getElementById('loggedAsNote').textContent = currentUser
+    ? `Registrando como ${currentUser.displayName || currentUser.email}`
+    : '';
   currentUnit = 'kg';
   document.querySelectorAll('.unit-toggle button').forEach(b=>b.classList.toggle('active', b.dataset.unit==='kg'));
   if(!items.length){
@@ -176,14 +179,14 @@ function setupEvents(){
     const itemId = document.getElementById('priceItemSelect').value;
     const price = parseFloat(document.getElementById('priceValue').value);
     const place = document.getElementById('priceLocal').value.trim();
-    const person = document.getElementById('priceNome').value.trim();
     const date = document.getElementById('priceData').value || todayStr();
+    const person = currentUser ? (currentUser.displayName || currentUser.email) : 'Anônimo';
 
-    if(!itemId || !price || price<=0 || !place || !person){
+    if(!itemId || !price || price<=0 || !place || !currentUser){
       document.getElementById('errPrice').classList.add('show');
       return;
     }
-    const created = await DB.addPrice({ itemId, price, unit: currentUnit, place, person, date });
+    const created = await DB.addPrice({ itemId, price, unit: currentUnit, place, person, date, uid: currentUser.uid });
     if(created){ prices.push(created); }
     render();
     closeModal('overlayPrice');
@@ -200,8 +203,44 @@ function registerServiceWorker(){
   }
 }
 
+function showAuthScreen(){
+  document.getElementById('authScreen').style.display = 'flex';
+  document.getElementById('appContent').style.display = 'none';
+}
+
+function showApp(user){
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('appContent').style.display = 'block';
+  document.getElementById('userName').textContent = user.displayName || user.email;
+}
+
+function setupAuthEvents(){
+  document.getElementById('googleSignInBtn').addEventListener('click', async ()=>{
+    try{
+      await Auth.signInWithGoogle();
+    }catch(err){
+      console.error('Erro no login:', err);
+      alert('Não foi possível entrar com o Google. Tente de novo.');
+    }
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', async ()=>{
+    await Auth.signOut();
+  });
+
+  Auth.onAuthStateChanged(async (user)=>{
+    currentUser = user;
+    if(user){
+      showApp(user);
+      await loadData();
+    }else{
+      showAuthScreen();
+    }
+  });
+}
+
 document.addEventListener('DOMContentLoaded', ()=>{
   setupEvents();
+  setupAuthEvents();
   registerServiceWorker();
-  loadData();
 });

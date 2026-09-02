@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Preço na Praça</title>
+<title>Preço Doce</title>
 
 <!-- PWA: permite "adicionar à tela inicial" -->
 <link rel="manifest" href="manifest.json">
@@ -11,14 +11,36 @@
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Preço na Praça">
+<meta name="apple-mobile-web-app-title" content="Preço Doce">
 
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-<div class="wrap">
+  <!-- TELA DE LOGIN: some assim que a pessoa entra com o Google -->
+<div class="auth-screen" id="authScreen">
+  <div class="auth-card">
+    <div class="eyebrow">catálogo colaborativo</div>
+    <h1>Preço <span>Doce</span></h1>
+    <p class="sub">Entre com sua conta Google pra ver o catálogo e registrar preços. Cada preço fica vinculado a quem registrou.</p>
+    <button class="btn-google" id="googleSignInBtn">
+      <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84c-.21 1.13-.85 2.09-1.81 2.73v2.27h2.92c1.71-1.57 2.69-3.89 2.69-6.64z"/>
+        <path fill="#34A853" d="M9 18c2.43 0 4.47-.81 5.96-2.18l-2.92-2.27c-.81.54-1.85.86-3.04.86-2.34 0-4.32-1.58-5.03-3.71H.96v2.33C2.44 15.98 5.48 18 9 18z"/>
+        <path fill="#FBBC05" d="M3.97 10.7c-.18-.54-.28-1.11-.28-1.7s.1-1.16.28-1.7V4.97H.96C.35 6.17 0 7.55 0 9s.35 2.83.96 4.03l3.01-2.33z"/>
+        <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.96 4.97l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z"/>
+      </svg>
+      Entrar com Google
+    </button>
+  </div>
+</div>
+
+<div class="wrap app-content" id="appContent">
   <header>
+    <div class="user-bar" id="userBar">
+      <span id="userName" class="user-name"></span>
+      <button class="btn-logout" id="logoutBtn">Sair</button>
+    </div>
     <div class="eyebrow">catálogo colaborativo</div>
     <h1>Preço <span>Doce</span></h1>
     <p class="sub">Viu um preço no mercado, na feira ou no hortifruti? Registra aqui. Cada preço fica com nome, local e data — pra todo mundo comparar por kg ou por unidade.</p>
@@ -82,15 +104,12 @@
       <label>Onde você viu</label>
       <input type="text" id="priceLocal" placeholder="Ex: Mercado São Luiz, Feira da Vila">
     </div>
-    <div class="field">
-      <label>Seu nome</label>
-      <input type="text" id="priceNome" placeholder="Ex: Ana">
-    </div>
-    <div class="field">
-      <label>Data</label>
-      <input type="date" id="priceData">
-    </div>
-    <div class="err" id="errPrice">Preencha item, preço, local e nome.</div>
+        <div class="field">
+          <label>Data</label>
+          <input type="date" id="priceData">
+        </div>
+        <div class="modal-sub" id="loggedAsNote"></div>
+        <div class="err" id="errPrice">Preencha item, preço e local.</div>
     <div class="modal-actions">
       <button class="btn btn-ghost" data-close="overlayPrice">Cancelar</button>
       <button class="btn btn-primary" id="savePrice">Registrar</button>
@@ -111,10 +130,11 @@
   </div>
 </div>
 
-<!-- SDK do Firebase (banco de dados) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="js/db.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
