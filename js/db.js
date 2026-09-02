@@ -28,7 +28,7 @@
     appId: "1:719911568826:web:7f0e32c0fdebd8ea728983"
   };
 
-firebase.initializeApp(FIREBASE_CONFIG);
+firebase.initializeApp(firebaseConfig);
 const firestore = firebase.firestore();
 
 const DB = {
